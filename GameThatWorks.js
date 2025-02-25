@@ -1,3 +1,12 @@
+// TODO
+
+// 1. make it harder 
+// 2. dlete all code and quitr coding and dleete gitbin
+
+
+
+
+
 /*******************************************************/
 // P5.play: t22_keyboard
 // Move sprite via keyboard
@@ -9,12 +18,10 @@
 
 const GameWidth = 800;
 const GameHeight = 800;
-const NumberOfCoins = 200;
+const NumberOfCoins = 1000;
 const TextSize = 35;
-const GameSeconds = 5;
+const GameSeconds = 15;
 var Score = 0;
-var GameRunning = true;
-var HaveTheyWon = false;
 
 function setup() {
 	console.log("setup: ");
@@ -32,11 +39,6 @@ function setup() {
 	Spinner.vel.x = 0;
 	Spinner.bounciness = 0;
 	Spinner.friction = 200;
-
-	/*Ball = new Sprite(500, 300, 200, "d");
-	Ball.color = "Red";
-	Ball.vel.x = 0;
-	Ball.vel.y = 20;*/
 
 	WallGroup = new Group();
 	Wall_Left = new Sprite(GameWidth + 10, 0, 20, GameHeight * 2, 'k');
@@ -68,7 +70,6 @@ function setup() {
 	function CollisionFunction(WhichCoin, Spinner) {
 		WhichCoin.remove();
         Score++;
-		//MakeCoin();
 	}
 }
 	
@@ -76,33 +77,35 @@ function setup() {
 // draw()
 /*******************************************************/
 function draw() {
- 	background('red');
 	
+	// Controls
     Player.moveTowards(mouseX, mouseY, 0.05);
 	if (mouse.presses()) {
 		Player.moveTo(mouseX, mouseY, 10);
 	}
 
-    if(GameRunning == true) {
-        textSize(TextSize);
-        fill('white');
-        text("Score: " + Score + "/" + NumberOfCoins, 15, TextSize);
-        text("Timer: " + (GameSeconds - Math.floor(millis()/1000)), 15, TextSize * 2 + 15);
-    } else if (GameRunning == true && HaveTheyWon == false) {
-        text("Game Over :(", GameWidth / 2 - 110, GameHeight / 2 - 20);
-        text("Your Score: " + Score + "/" + NumberOfCoins, GameWidth / 2 - 150, GameHeight / 2 + TextSize)
-    }
-
+	// Display text and check if game is over
     if(millis() >= GameSeconds * 1000) {
-        EndGame();
-    }    
-    
-    function EndGame() {
-        GameRunning = false;
+		// If game is over remove coins and 
         CoinGroup.remove();
         Spinner.remove();
         Player.remove();
-    }
+		if(Score >= NumberOfCoins) {
+			background('green');
+			text("You Won :)", GameWidth / 2 - 75, GameHeight / 2 - 20);
+			text("Your Score: " + Score + "/" + NumberOfCoins, GameWidth / 2 - 150, GameHeight / 2 + TextSize);
+		} else {
+			background('red');
+			text("Game Over :(", GameWidth / 2 - 110, GameHeight / 2 - 20);
+			text("Your Score: " + Score + "/" + NumberOfCoins, GameWidth / 2 - 150, GameHeight / 2 + TextSize);
+		}
+    } else {
+		background('red');
+		textSize(TextSize);
+        fill('white');
+        text("Score: " + Score + "/" + NumberOfCoins, 15, TextSize);
+        text("Timer: " + (GameSeconds - Math.floor(millis()/1000)), 15, TextSize * 2 + 15);
+	}
 }
 
 /*******************************************************/
