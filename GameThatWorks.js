@@ -20,13 +20,21 @@ const GameWidth = 800;
 const GameHeight = 800;
 const NumberOfCoins = 1000;
 const TextSize = 35;
-const GameSeconds = 15;
+const GameSeconds = 2;
 var Score = 0;
+var ElapsedTime = 0;
+var StartTime;
 
 function setup() {
 	console.log("setup: ");
 	cnv = new Canvas(GameWidth, GameWidth);
 	world.gravity.y = 10;
+	StartTime = millis();
+
+	RestartButton = createButton("Restart Game");
+	RestartButton.position(GameWidth / 2 - 55, GameHeight / 2 + 2 * TextSize);
+	RestartButton.mousePressed(RestartGame);
+	RestartButton.hide();
 
 	Player = new Sprite(500, 200, 100, 100, 'd');
 	Player.color = "White";
@@ -52,24 +60,31 @@ function setup() {
 
 	WallGroup.bounciness = 1.5;
 
+	// Coin Functionality
 	CoinGroup = new Group();
-	for (var i = 0; i < NumberOfCoins; i++) {
-		MakeCoin();
-	}
 
-	function MakeCoin() {
-		Coin = new Sprite(Math.random() * GameWidth, Math.random() * GameHeight, 20, "d");
-		Coin.vel.x = 3;
-		Coin.vel.y = 4;
-		Coin.bounciness = 0.5;
-		Coin.friction = 0;
-		CoinGroup.add(Coin);
+	MakeCoins();
+	function MakeCoins() {
+		for (var i = 0; i < NumberOfCoins; i++) {
+			Coin = new Sprite(Math.random() * GameWidth, Math.random() * GameHeight, 20, "d");
+			Coin.vel.x = 3;
+			Coin.vel.y = 4;
+			Coin.bounciness = 0.5;
+			Coin.friction = 0;
+			CoinGroup.add(Coin);
+		}
 	}
-
 	CoinGroup.collides(Player, CollisionFunction);
 	function CollisionFunction(WhichCoin, Spinner) {
 		WhichCoin.remove();
         Score++;
+	}
+
+	function RestartGame() {
+		StartTime = millis();
+		RestartButton.hide();
+		Score = 0;
+		MakeCoins();
 	}
 }
 	
@@ -84,12 +99,14 @@ function draw() {
 		Player.moveTo(mouseX, mouseY, 10);
 	}
 
+	textSize(TextSize);
 	// Display text and check if game is over
-    if(millis() >= GameSeconds * 1000) {
-		// If game is over remove coins and 
+    if((millis() - StartTime) >= GameSeconds * 1000) {
+		// If game is over hide sprites
         CoinGroup.remove();
         Spinner.remove();
         Player.remove();
+		RestartButton.show();
 		if(Score >= NumberOfCoins) {
 			background('green');
 			text("You Won :)", GameWidth / 2 - 75, GameHeight / 2 - 20);
@@ -101,10 +118,9 @@ function draw() {
 		}
     } else {
 		background('red');
-		textSize(TextSize);
         fill('white');
         text("Score: " + Score + "/" + NumberOfCoins, 15, TextSize);
-        text("Timer: " + (GameSeconds - Math.floor(millis()/1000)), 15, TextSize * 2 + 15);
+        text("Timer: " + (GameSeconds - Math.floor((millis() - StartTime)/1000)), 15, TextSize * 2 + 15);
 	}
 }
 
