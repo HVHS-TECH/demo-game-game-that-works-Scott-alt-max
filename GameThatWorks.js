@@ -20,7 +20,7 @@ const GameWidth = 800;
 const GameHeight = 800;
 const NumberOfCoins = 1000;
 const TextSize = 35;
-const GameSeconds = 2;
+const GameSeconds = 15;
 var Score = 0;
 var ElapsedTime = 0;
 var StartTime;
@@ -31,11 +31,7 @@ function setup() {
 	world.gravity.y = 10;
 	StartTime = millis();
 
-	RestartButton = createButton("Restart Game");
-	RestartButton.position(GameWidth / 2 - 55, GameHeight / 2 + 2 * TextSize);
-	RestartButton.mousePressed(RestartGame);
-	RestartButton.hide();
-
+	// Sprites
 	Player = new Sprite(500, 200, 100, 100, 'd');
 	Player.color = "White";
 	Player.vel.x = 2;
@@ -64,30 +60,19 @@ function setup() {
 	CoinGroup = new Group();
 
 	MakeCoins();
-	function MakeCoins() {
-		for (var i = 0; i < NumberOfCoins; i++) {
-			Coin = new Sprite(Math.random() * GameWidth, Math.random() * GameHeight, 20, "d");
-			Coin.vel.x = 3;
-			Coin.vel.y = 4;
-			Coin.bounciness = 0.5;
-			Coin.friction = 0;
-			CoinGroup.add(Coin);
-		}
-	}
 	CoinGroup.collides(Player, CollisionFunction);
-	function CollisionFunction(WhichCoin, Spinner) {
+	function CollisionFunction(WhichCoin, Player) {
 		WhichCoin.remove();
         Score++;
 	}
 
-	function RestartGame() {
-		StartTime = millis();
-		RestartButton.hide();
-		Score = 0;
-		MakeCoins();
-	}
+	// Restart button
+	RestartButton = createButton("Restart Game");
+	RestartButton.position(GameWidth / 2 - 55, GameHeight / 2 + 2 * TextSize);
+	RestartButton.mousePressed(RestartGame);
+	RestartButton.hide();
 }
-	
+
 /*******************************************************/
 // draw()
 /*******************************************************/
@@ -95,17 +80,21 @@ function draw() {
 	
 	// Controls
     Player.moveTowards(mouseX, mouseY, 0.05);
-	if (mouse.presses()) {
-		Player.moveTo(mouseX, mouseY, 10);
+
+	// Check if they try to restart
+	if(kb.presses('r')) {
+        CoinGroup.removeAll();
+		RestartGame();
 	}
 
+	
 	textSize(TextSize);
 	// Display text and check if game is over
     if((millis() - StartTime) >= GameSeconds * 1000) {
 		// If game is over hide sprites
-        CoinGroup.remove();
-        Spinner.remove();
-        Player.remove();
+        CoinGroup.removeAll();
+        Spinner.visible = false;
+        Player.visible = false;
 		RestartButton.show();
 		if(Score >= NumberOfCoins) {
 			background('green');
@@ -123,6 +112,25 @@ function draw() {
         text("Timer: " + (GameSeconds - Math.floor((millis() - StartTime)/1000)), 15, TextSize * 2 + 15);
 	}
 }
+
+function RestartGame() {
+	StartTime = millis();
+	RestartButton.hide();
+	Score = 0;Spinner.visible = true;
+	Player.visible = true;
+	MakeCoins();
+}
+function MakeCoins() {
+	for (var i = 0; i < NumberOfCoins; i++) {
+		Coin = new Sprite(Math.random() * GameWidth, Math.random() * GameHeight, 20, "d");
+		Coin.vel.x = 3;
+		Coin.vel.y = 4;
+		Coin.bounciness = 0.5;
+		Coin.friction = 0;
+		CoinGroup.add(Coin);
+	}
+}
+	
 
 /*******************************************************/
 //  END OF APP
