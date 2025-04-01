@@ -22,7 +22,6 @@ const NumberOfCoins = 1000;
 const TextSize = 35;
 const GameSeconds = 15;
 var Score = 0;
-var ElapsedTime = 0;
 var StartTime;
 
 function setup() {
@@ -86,7 +85,6 @@ function draw() {
         CoinGroup.removeAll();
 		RestartGame();
 	}
-
 	
 	textSize(TextSize);
 	// Display text and check if game is over
